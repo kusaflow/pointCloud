@@ -5,16 +5,23 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/KismetRenderingLibrary.h"
+#include "Kismet/GameplayStatics.h"
+#include "DrawDebugHelpers.h"
+#include "Components/SceneComponent.h"
 
 // Sets default values
 AcaptureCD::AcaptureCD()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	scencomp = CreateDefaultSubobject<USceneComponent>(TEXT("scene"));
+	RootComponent = scencomp;
+
 	capture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("sceneCapture"));
-	RootComponent = capture;
+	capture->SetupAttachment(scencomp);
 
 	totalVert = 0;
-	CollectData();
+	
 
 }
 
@@ -22,6 +29,9 @@ AcaptureCD::AcaptureCD()
 void AcaptureCD::BeginPlay()
 {
 	Super::BeginPlay();
+	CollectData();
+	DrawDots();
+	MakeStrData();
 	
 }
 
@@ -34,21 +44,28 @@ void AcaptureCD::Tick(float DeltaTime)
 
 void AcaptureCD::CollectData() {
 	totalVert = 0;
-	for (int i = 0; i <= 360; i += ScanIterator) {
-		for (int j = 0; j <= 360; j += ScanIterator) {
+	for (int i = 0; i < 180; i += ScanIterator*2) {
+		for (int j = ScanIterator; j < 360; j += ScanIterator) {
 			FHitResult hit;
 			FVector start = GetActorLocation();
 			FRotator rot = FRotator(j, i, 0);
 			FVector end = FVector(start.X* TraceLen, start.Y, start.Z);
 			end = rot.RotateVector(end);
 
+			capture->SetRelativeRotation(rot);
+
 			FCollisionQueryParams prams;
 			prams.bTraceComplex = true;
+
+			FVector end2 = GetActorForwardVector() * TraceLen;
+			end2 += start;
+			//DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 5, 0, 1);
 
 			if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility, prams)) {
 				totalVert++;
 				Vertices.Add(hit.ImpactPoint);
 				Vertices_normals.Add(hit.ImpactNormal);
+
 
 				//colors
 				UTextureRenderTarget2D* RenderTarget = capture->TextureTarget;
@@ -72,10 +89,35 @@ void AcaptureCD::CollectData() {
 
 
 void AcaptureCD :: DrawDots() {
+	FActorSpawnParameters spawnPara;
+	spawnPara.Owner = this;
 
+	UWorld* world = GetWorld();
+	for (int i = 0; i < Vertices.Num(); i++) {
+		world->SpawnActor<AActor>(dots,Vertices[i], FRotator(0), spawnPara);
+
+		
+	}
 }
 
+void AcaptureCD::MakeStrData() {
+	for (int i = 0; i < Vertices.Num(); i++) {
+		FString str = FString::SanitizeFloat(Vertices[i].X) + " " +
+			FString::SanitizeFloat(Vertices[i].Y) + " " +
+			FString::SanitizeFloat(Vertices[i].Z) + " " +
+			FString::SanitizeFloat(V_Colors[i].X) + " " +
+			FString::SanitizeFloat(V_Colors[i].Y) + " " +
+			FString::SanitizeFloat(V_Colors[i].Z) + " " +
+			FString::SanitizeFloat(Vertices_normals[i].X) + " " +
+			FString::SanitizeFloat(Vertices_normals[i].Y) + " " +
+			FString::SanitizeFloat(Vertices_normals[i].Z) + " ";
 
+		Data.Add(str);
+
+
+	}
+
+}
 
 
 

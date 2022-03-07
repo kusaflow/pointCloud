@@ -18,6 +18,8 @@ public:
 	TArray<FVector> Vertices;
 	TArray<FVector> Vertices_normals;
 	TArray<FVector> V_Colors;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 	TArray<FString> Data;
 
 	int totalVert;
@@ -30,6 +32,11 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 		class USceneCaptureComponent2D* capture;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		class USceneComponent* scencomp;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		TSubclassOf<class AActor> dots;
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,6 +47,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void CollectData();
+
+	void DrawDots();
+	void MakeStrData();
 
 
 };
