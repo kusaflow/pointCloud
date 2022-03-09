@@ -40,15 +40,17 @@ void ACaptureColor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (i < 180) {
-		CollectData();
-		
-	}
-	else {
-		if (drawOnce) {
-			DrawDots();
-			drawOnce = false;
-			DataCaptured = true;
+	if (start_Capturing) {
+		if (i < 180) {
+			CollectData();
+
+		}
+		else {
+			if (drawOnce) {
+				//DrawDots();
+				drawOnce = false;
+				DataCaptured = true;
+			}
 		}
 	}
 
@@ -96,7 +98,7 @@ void ACaptureColor::CollectData() {
 	}
 	else {
 		j = ScanIterator;
-		i += ScanIterator * 2;
+		i += ScanIterator;
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("%f-----%f"), i, j);
@@ -111,9 +113,8 @@ void ACaptureColor::DrawDots() {
 
 	UWorld* world = GetWorld();
 	for (int itr = 0; itr < Vertices.Num(); itr++) {
-		world->SpawnActor<AActor>(dots, Vertices[itr], FRotator(0), spawnPara);
-
-
+		AActor* cap_balls = world->SpawnActor<AActor>(dots, Vertices[itr], FRotator(0), spawnPara);
+		cap_balls->SetActorScale3D(FVector(cap_Size));
 	}
 }
 

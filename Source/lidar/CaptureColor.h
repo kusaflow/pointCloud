@@ -40,9 +40,15 @@ public:
 
 	float i = 0, j = 0;
 	bool drawOnce = true;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+	bool start_Capturing = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 	bool DataCaptured = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		float cap_Size;
 
 protected:
 	// Called when the game starts or when spawned
