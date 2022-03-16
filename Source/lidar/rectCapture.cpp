@@ -1,48 +1,54 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "CaptureColor.h"
+#include "rectCapture.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Engine/TextureRenderTarget2D.h"
 #include "Kismet/KismetRenderingLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "DrawDebugHelpers.h"
 #include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
 
 // Sets default values
-ACaptureColor::ACaptureColor()
+ArectCapture::ArectCapture()
 {
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 	scencomp = CreateDefaultSubobject<USceneComponent>(TEXT("scene"));
 	RootComponent = scencomp;
+
+	plane = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("plane"));
+	plane->SetupAttachment(scencomp);
 
 	capture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("sceneCapture"));
 	capture->SetupAttachment(scencomp);
 
-	totalVert = 0;
+	arrow = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("arrow"));
+	arrow->SetupAttachment(plane);
 
-	i = 0;
-	j = ScanIterator;
+	plane->bHiddenInGame = true;
+	arrow->bHiddenInGame = true;
+
+
 
 }
 
 // Called when the game starts or when spawned
-void ACaptureColor::BeginPlay()
+void ArectCapture::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
 }
 
 // Called every frame
-void ACaptureColor::Tick(float DeltaTime)
+void ArectCapture::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
 	if (start_Capturing) {
-		if (i < ScanAngleLmt/2) {
-			CollectData();
+		if (i >= plane->GetRelativeScale3D().X) {
+			//+CollectData();
 
 		}
 		else {
@@ -56,58 +62,12 @@ void ACaptureColor::Tick(float DeltaTime)
 
 }
 
-void ACaptureColor::CollectData() {
-
-	FHitResult hit;
-	FVector start = GetActorLocation();
-	FRotator rot = FRotator(j, i, 0);
-	FVector end = FVector(start.X * TraceLen, start.Y, start.Z);
-	end = rot.RotateVector(end);
-
-	capture->SetRelativeRotation(rot);
-
-	FCollisionQueryParams prams;
-	prams.bTraceComplex = true;
-
-	FVector end2 = GetActorForwardVector() * TraceLen;
-	end2 += start;
-	//DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 5, 0, 1);
-
-	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility, prams)) {
-		totalVert++;
-		Vertices.Add(hit.ImpactPoint);
-		Vertices_normals.Add(hit.ImpactNormal);
-
-
-		//colors
-		UTextureRenderTarget2D* RenderTarget = capture->TextureTarget;
-		int sx = capture->TextureTarget->SizeX;
-		int sy = capture->TextureTarget->SizeY;
-
-		sx /= 2;
-		sy /= 2;
-
-		FColor color = UKismetRenderingLibrary::ReadRenderTargetPixel(GetWorld(), RenderTarget, sx, sy);
-		FVector col = FVector(color.R, color.G, color.B);
-		V_Colors.Add(col);
-
-	}
-
-	if (j < ScanAngleLmt) {
-		j += ScanIterator;
-	}
-	else {
-		j = ScanIterator;
-		i += ScanIterator;
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("%f-----%f"), i, j);
-
-}
 
 
 
-void ACaptureColor::DrawDots() {
+
+
+void ArectCapture::DrawDots() {
 	FActorSpawnParameters spawnPara;
 	spawnPara.Owner = this;
 
@@ -118,7 +78,7 @@ void ACaptureColor::DrawDots() {
 	}
 }
 
-void ACaptureColor::MakeStrData() {
+void ArectCapture::MakeStrData() {
 	for (int itr = 0; itr < Vertices.Num(); itr++) {
 		FString str = FString::SanitizeFloat(Vertices[itr].X) + " " +
 			FString::SanitizeFloat(Vertices[itr].Y) + " " +
@@ -136,9 +96,4 @@ void ACaptureColor::MakeStrData() {
 	}
 
 }
-
-
-
-
-
 

@@ -33,6 +33,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 		float Itr_For_captureDomes = 10;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		int ScanAngleLmt = 360;
+
+
 protected:
 	
 public:	

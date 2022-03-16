@@ -23,11 +23,16 @@ void ACaptureAllColorMngr::Tick(float DeltaTime)
 	
 	if (!fileMade) {
 		if (doesEveryThingCaptured()) {
+			//UE_LOG(LogTemp, Warning, TEXT("alldone"));
+			//for last dome
+			TA_domes[capIdx]->MakeStrData();
 			makeMainFile();
 		}
-		else {
+		else {		
 			if (capIdx < TA_domes.Num()) {
+				//UE_LOG(LogTemp, Warning, TEXT("gg"));
 				if (TA_domes[capIdx]->DataCaptured) {
+					//UE_LOG(LogTemp, Warning, TEXT("dataCaptured"));
 					TA_domes[capIdx]->MakeStrData();
 					TA_domes[capIdx]->capture->TextureTarget = nullptr;
 					capIdx++;
@@ -35,10 +40,12 @@ void ACaptureAllColorMngr::Tick(float DeltaTime)
 				}
 				else {
 					if (CapDataReset) {
+						//UE_LOG(LogTemp, Warning, TEXT("capdataReset"));
 						TA_domes[capIdx]->capture->TextureTarget = RT_tex;
 						TA_domes[capIdx]->start_Capturing = true;
 						CapDataReset = false;
 						TA_domes[capIdx]->ScanIterator = Itr_For_captureDomes;
+						TA_domes[capIdx]->ScanAngleLmt = ScanAngleLmt;
 					}
 				}
 
