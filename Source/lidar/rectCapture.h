@@ -17,6 +17,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 		class UStaticMeshComponent* plane;
+	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 		class UStaticMeshComponent* arrow;
@@ -43,7 +44,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 		float ScanIterator = 10;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
-		float TraceLen = 10;
+		float TraceLen = 2500;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
 		TSubclassOf<class AActor> dots;
@@ -58,9 +59,16 @@ public:
 		bool DataCaptured = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
-		float cap_Size;
+		float cap_Size = 2;
 
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		FVector planeDim = FVector(200,0,200);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		bool drawDebugRay = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "customVar")
+		bool overrideIttVal = true;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -69,7 +77,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	//void CollectData();
+	void CollectData();
 
 	void DrawDots();
 

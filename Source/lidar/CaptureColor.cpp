@@ -81,16 +81,17 @@ void ACaptureColor::CollectData() {
 
 		//colors
 		UTextureRenderTarget2D* RenderTarget = capture->TextureTarget;
-		int sx = capture->TextureTarget->SizeX;
-		int sy = capture->TextureTarget->SizeY;
+		if (RenderTarget) {
+			int sx = capture->TextureTarget->SizeX;
+			int sy = capture->TextureTarget->SizeY;
 
-		sx /= 2;
-		sy /= 2;
+			sx /= 2;
+			sy /= 2;
 
-		FColor color = UKismetRenderingLibrary::ReadRenderTargetPixel(GetWorld(), RenderTarget, sx, sy);
-		FVector col = FVector(color.R, color.G, color.B);
-		V_Colors.Add(col);
-
+			FColor color = UKismetRenderingLibrary::ReadRenderTargetPixel(GetWorld(), RenderTarget, sx, sy);
+			FVector col = FVector(color.R, color.G, color.B);
+			V_Colors.Add(col);
+		}
 	}
 
 	if (j < ScanAngleLmt) {
@@ -101,7 +102,7 @@ void ACaptureColor::CollectData() {
 		i += ScanIterator;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("%f-----%f"), i, j);
+	//UE_LOG(LogTemp, Warning, TEXT("%f-----%f"), i, j);
 
 }
 

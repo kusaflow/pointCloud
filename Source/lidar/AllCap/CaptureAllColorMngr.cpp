@@ -20,6 +20,8 @@ void ACaptureAllColorMngr::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
+	if (TA_domes.Num() == 0)
+		return;
 	
 	if (!fileMade) {
 		if (doesEveryThingCaptured()) {

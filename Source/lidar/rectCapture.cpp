@@ -22,7 +22,7 @@ ArectCapture::ArectCapture()
 	plane->SetupAttachment(scencomp);
 
 	capture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("sceneCapture"));
-	capture->SetupAttachment(scencomp);
+	capture->SetupAttachment(plane);
 
 	arrow = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("arrow"));
 	arrow->SetupAttachment(plane);
@@ -38,7 +38,7 @@ ArectCapture::ArectCapture()
 void ArectCapture::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	//start_Capturing = true;
 }
 
 // Called every frame
@@ -46,9 +46,11 @@ void ArectCapture::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+
 	if (start_Capturing) {
-		if (i >= plane->GetRelativeScale3D().X) {
-			//+CollectData();
+		if (i < plane->GetRelativeScale3D().Z * planeDim.Z) {
+			CollectData();
 
 		}
 		else {
@@ -62,6 +64,53 @@ void ArectCapture::Tick(float DeltaTime)
 
 }
 
+void ArectCapture::CollectData() {
+
+	capture->SetRelativeLocation(FVector(j, 0, i));
+
+	FHitResult hit;
+	FVector start = capture->GetComponentLocation();
+	FVector end = capture->GetForwardVector() * TraceLen;
+	end += start;
+
+	FCollisionQueryParams prams;
+	prams.bTraceComplex = true;
+
+	if (drawDebugRay)
+		DrawDebugLine(GetWorld(), start, end, FColor::Green, false, 5, 0, 1);
+
+	if (GetWorld()->LineTraceSingleByChannel(hit, start, end, ECollisionChannel::ECC_Visibility, prams)) {
+		totalVert++;
+		Vertices.Add(hit.ImpactPoint);
+		Vertices_normals.Add(hit.ImpactNormal);
+
+
+		//colors
+		UTextureRenderTarget2D* RenderTarget = capture->TextureTarget;
+
+		int sx = capture->TextureTarget->SizeX;
+		int sy = capture->TextureTarget->SizeY;
+
+		sx /= 2;
+		sy /= 2;
+
+		FColor color = UKismetRenderingLibrary::ReadRenderTargetPixel(GetWorld(), RenderTarget, sx, sy);
+		FVector col = FVector(color.R, color.G, color.B);
+		V_Colors.Add(col);
+
+	}
+
+	if (j < planeDim.X) {
+		j += ScanIterator/ GetActorScale3D().X;
+	}
+	else {
+		j = 0;
+		i += ScanIterator / GetActorScale3D().Z;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("%f-----%f"), i, j);
+
+}
 
 
 
