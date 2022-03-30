@@ -41,8 +41,8 @@ AMotionScan::AMotionScan()
 void AMotionScan::BeginPlay()
 {
 	Super::BeginPlay();
-	start_Capturing = true;
-	GetPlanePosToCapture();
+	//start_Capturing = true;
+	
 }
 
 // Called every frame
